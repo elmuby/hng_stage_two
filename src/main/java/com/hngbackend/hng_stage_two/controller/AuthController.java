@@ -47,10 +47,10 @@ public class AuthController {
 	private CustomUserDetailsService customUserDetailsService;
 
 	private OrganizationRepository organizationRepository;
-	
+
 	private UserOrganizationRepository userOrganizationRepository;
 
-	public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, 
+	public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder,
 			CustomUserDetailsService customUserDetailsService, OrganizationRepository organizationRepository,
 			JwtProvider jwtProvider, UserOrganizationRepository userOrganizationRepository) {
 		super();
@@ -83,19 +83,15 @@ public class AuthController {
 			defaultOrganization.setName(savedUser.getFirstName() + "'s Organisation");
 			defaultOrganization.setDescription("Default organization for " + user.getFirstName());
 			organizationRepository.save(defaultOrganization);
-			
+
 //			to create user organization relationship
 			UserOrganisation userOrganisation = new UserOrganisation();
 			userOrganisation.setOrganisation(defaultOrganization);
 			userOrganisation.setUser(savedUser);
 			userOrganizationRepository.save(userOrganisation);
 
-//			Authentication authentication = new UsernamePasswordAuthenticationToken(user.getEmail(),
-//					user.getPassword());
-//			Authentication authentication = authenticate(savedUser.getEmail(), savedUser.getPassword());
-//			SecurityContextHolder.getContext().setAuthentication(authentication);
-			
-			Authentication authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
+			Authentication authentication = new UsernamePasswordAuthenticationToken(user.getEmail(),
+					user.getPassword());
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 
 			String token = jwtProvider.generateToken(authentication);
@@ -117,12 +113,10 @@ public class AuthController {
 	public ResponseEntity<?> signin(@RequestBody @Validated LoginRequest request) {
 		try {
 			Authentication authentication = authenticate(request.getEmail(), request.getPassword());
-			
+
 			Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-			String role = authorities.isEmpty()?null:authorities.iterator().next().getAuthority();
-			
-//			String jwt = jwtUtils.generateToken(authentication);
-			
+			String role = authorities.isEmpty() ? null : authorities.iterator().next().getAuthority();
+
 			String jwt = jwtProvider.generateToken(authentication);
 			User user = userRepository.findByEmail(request.getEmail())
 					.orElseThrow(() -> new UsernameNotFoundException("User not found"));

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,21 +18,29 @@ import io.jsonwebtoken.Jwts;
 @Service
 public class JwtProvider {
 
-	private SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
-	
+	@Value("${jwt.secret}")
+	private String secret;
+	private SecretKey key;
+
+	private void initKey() {
+		if (this.key == null) {
+			this.key = Keys.hmacShaKeyFor(secret.getBytes());
+		}
+	}
 
 	public String generateToken(Authentication auth) {
+		initKey();
+		
 		Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
 
 		String roles = populateAuthorities(authorities);
 
-		String jwt = Jwts.builder().setIssuedAt(new Date()).setExpiration(new Date(new Date().getTime() + 86400000))
+		String jwt = Jwts.builder().setIssuedAt(new Date()).setExpiration(new Date(new Date().getTime() + 600000))
 				.claim("email", auth.getName()).claim("authorities", roles).signWith(key).compact();
 
 		return jwt;
 	}
 
-	
 	public String getEmailFromJwtToken(String jwt) {
 		jwt = jwt.substring(7);
 		Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();

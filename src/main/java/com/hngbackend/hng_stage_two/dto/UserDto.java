@@ -22,6 +22,15 @@ public class UserDto {
         this.phone = user.getPhone();
     }
 
+	public UserDto(String userId, String firstName, String lastName, String email, String phone) {
+		super();
+		this.userId = userId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.phone = phone;
+	}
+
 	public String getUserId() {
 		return userId;
 	}

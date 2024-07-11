@@ -1,16 +1,20 @@
 package com.hngbackend.hng_stage_two.model;
 
+import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -19,14 +23,14 @@ public class User {
 	public User() {
 		super();
 		this.userId = UUID.randomUUID().toString();
-		
 
 	}
 
 	public User(String userId, @NotNull(message = "first name is required") String firstName,
 			@NotNull(message = "last name is required") String lastName,
 			@NotNull(message = "email is required") @Email String email,
-			@NotNull(message = "password is required") String password, String phone, USER_ROLE role) {
+			@NotNull(message = "password is required") String password, String phone,
+			Set<UserOrganisation> userOrganisations, USER_ROLE role) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -34,7 +38,7 @@ public class User {
 		this.email = email;
 		this.password = password;
 		this.phone = phone;
-		
+		this.userOrganisations = userOrganisations;
 		this.role = role;
 	}
 
@@ -43,15 +47,17 @@ public class User {
 
 	@Column(nullable = false)
 	@NotNull(message = "first name is required")
+	@Size(min = 1, message = "First name cannot be empty")
 	private String firstName;
 
 	@Column(nullable = false)
 	@NotNull(message = "last name is required")
+	@Size(min = 1, message = "Last name cannot be empty")
 	private String lastName;
 
 	@Column(nullable = false, unique = true)
 	@NotNull(message = "email is required")
-	@Email
+	@Email(message = "Email should be valid")
 	private String email;
 
 	@Column(nullable = false)
@@ -61,8 +67,10 @@ public class User {
 
 	private String phone;
 
-	
-	private USER_ROLE  role = USER_ROLE.ROLE_USER;
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private Set<UserOrganisation> userOrganisations;
+
+	private USER_ROLE role = USER_ROLE.ROLE_USER;
 
 	public String getUserId() {
 		return userId;
@@ -112,13 +120,20 @@ public class User {
 		this.phone = phone;
 	}
 
-
 	public USER_ROLE getRole() {
 		return role;
 	}
 
 	public void setRole(USER_ROLE role) {
 		this.role = role;
+	}
+
+	public Set<UserOrganisation> getUserOrganisations() {
+		return userOrganisations;
+	}
+
+	public void setUserOrganisations(Set<UserOrganisation> userOrganisations) {
+		this.userOrganisations = userOrganisations;
 	}
 
 }

@@ -1,15 +1,21 @@
 package com.hngbackend.hng_stage_two.model;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class UserOrganisation {
-	
+
 	public UserOrganisation() {
 		super();
-		
+
 	}
-	
 
 	public UserOrganisation(Long id, User user, Organisation organisation) {
 		super();
@@ -18,17 +24,18 @@ public class UserOrganisation {
 		this.organisation = organisation;
 	}
 
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne
 	@JoinColumn(name = "userId")
+	@JsonIgnore
 	private User user;
 
 	@ManyToOne
 	@JoinColumn(name = "orgId")
+	@JsonIgnore
 	private Organisation organisation;
 
 	public Long getId() {
@@ -54,7 +61,5 @@ public class UserOrganisation {
 	public void setOrganisation(Organisation organisation) {
 		this.organisation = organisation;
 	}
-	
-	
 
 }

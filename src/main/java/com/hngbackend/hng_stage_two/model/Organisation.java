@@ -1,10 +1,13 @@
 package com.hngbackend.hng_stage_two.model;
 
+import java.util.Set;
 import java.util.UUID;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -16,13 +19,13 @@ public class Organisation {
 
 	}
 
-	public Organisation(String orgId, @NotNull(message = "Name is required") String name, String description
-			) {
+	public Organisation(String orgId, @NotNull(message = "Name is required") String name, String description,
+			Set<UserOrganisation> userOrganisations) {
 		super();
 		this.orgId = orgId;
 		this.name = name;
 		this.description = description;
-		
+		this.userOrganisations = userOrganisations;
 	}
 
 	@Id
@@ -34,7 +37,8 @@ public class Organisation {
 
 	private String description;
 
-	
+	@OneToMany(mappedBy = "organisation", cascade = CascadeType.ALL)
+	private Set<UserOrganisation> userOrganisations;
 
 	public String getOrgId() {
 		return orgId;
@@ -60,6 +64,12 @@ public class Organisation {
 		this.description = description;
 	}
 
-	
+	public Set<UserOrganisation> getUserOrganisations() {
+		return userOrganisations;
+	}
+
+	public void setUserOrganisations(Set<UserOrganisation> userOrganisations) {
+		this.userOrganisations = userOrganisations;
+	}
 
 }
